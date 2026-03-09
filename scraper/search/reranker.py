@@ -83,8 +83,8 @@ def rerank_chunks(
     for i, chunk in enumerate(to_rerank):
         content = chunk.get("chunk_content", chunk.get("content", ""))
         # Truncate for reranking — we need enough to judge relevance
-        if len(content) > 800:
-            content = content[:800] + "..."
+        if len(content) > 1200:
+            content = content[:1200] + "..."
         chunk_id = chunk.get("id", i)
         chunk_texts.append(f"--- Chunk ID={chunk_id} ---\n{content}")
 

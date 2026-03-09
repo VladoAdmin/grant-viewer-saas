@@ -65,7 +65,11 @@ Pravidlá:
 - "missing": konkrétne informácie ktoré by mali byť v odpovedi ale nie sú v chunkoch
 - "suggested_queries": dotazy na dohľadanie chýbajúcich informácií (slovensky, špecificky)
 
-Buď PRÍSNY: ak otázka pýta konkrétne čísla/podmienky a chunky ich neobsahujú = nekompletné.
+Buď PRÍSNY ale REALISTICKÝ:
+- Ak chunky obsahujú absolútne čísla (EUR), nie percentá, stále hodnoť ako kompletné ak sú informácie dostatočné na odpoveď.
+- Ak otázka pýta "rozdelenie" a chunky obsahujú konkrétne sumy pre jednotlivé regióny/okresy, hodnoť ako kompletné.
+- Ak chýba explicitný údaj ale dá sa odvodiť z dostupných dát (napr. percentá z absolútnych súm), hodnoť ako kompletné.
+- Ak informácia je rozdelená medzi viac chunkov ale SPOLU dávajú úplnú odpoveď = kompletné.
 Buď KONKRÉTNY v "missing": nie "chýbajú detaily" ale "chýba presná suma minimálneho príspevku"."""
 
 
@@ -79,8 +83,8 @@ def _evaluate_once(
     chunk_texts = []
     for i, chunk in enumerate(chunks):
         content = chunk.get("chunk_content", chunk.get("content", ""))
-        if len(content) > 1500:
-            content = content[:1500] + "..."
+        if len(content) > 2000:
+            content = content[:2000] + "..."
         chunk_texts.append(f"--- Chunk {i + 1} (score: {chunk.get('rerank_score', 'N/A')}) ---\n{content}")
 
     user_prompt = (
