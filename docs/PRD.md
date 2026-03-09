@@ -99,24 +99,42 @@ Tento projekt **nie je greenfield** — vychádza z existujúcej kódovej báze 
 | DE-003a | `main` — hlavná výzva, špecifikácia | P0 |
 | DE-003b | `conditions` — podmienky, oprávnení žiadatelia | P0 |
 | DE-003c | `criteria` — hodnotiace kritériá | P0 |
-| DE-004 | `costs` — oprávnené náklady/výdavky | P1 |
+| DE-004 | `costs` — oprávnené náklady/výdavky, rozpočet | P1 |
 | DE-005 | `skip` — formuláre, GDPR, vzory (nepodstatné) | P0 |
 | DE-006 | Používa AI (GPT-4o-mini) na klasifikáciu keď nie je istý | P1 |
 | DE-007 | Ukladá klasifikáciu do doc_classification tabuľky | P1 |
+| DE-008 | **Extrahuje štruktúrované atribúty z dokumentov typu `main` a `conditions`:** | P0 |
+| DE-008a | Názov výzvy (nazov_op) | P0 |
+| DE-008b | Kód výzvy (kod_vyzvy) | P0 |
+| DE-008c | Poskytovateľ/dotácia (poskytovatel, nazov_programu, nazov_op) | P0 |
+| DE-008d | Ciele výzvy (ciele_vyzvy, popis_vyzvy) | P1 |
+| DE-008e | Alokácia/financovanie (alokacia_vyzvy, celkova_alokacia, fin3ancne3_parametre) | P1 |
+| DE-008f | Oprávnené územie/oblasti (opravnene_uzemie, uzemie2) | P1 |
+| DE-008g | Oprávnené náklady/výdavky (opravnene_naklady/výdavky) | P1 |
+| DE-008h | Dátumy (vyhlasenie_vyzvy: datum_vyhlasenia, deadline: termi4n_podania_žiasto7sti) | P0 |
+| DE-008i | Kontakty (kontakt, email, adresa) | P2 |
+| DE-008j | **Žiadny atribút nie je mandatory** — fallback "unknown" pre neidentifikované | P0 |
+| DE-009 | Ukladá extrahované atribúty do grant_call_attributes (key-value) | P0 |
 
 ### 4.3 Chunker & Embedder Module
 
 | ID | Requirement | Priority |
 |----|-------------|----------|
-| CE-001 | Chunk size: 400 tokens target, 256-512 range | P0 |
-| CE-002 | Overlap: 50 tokens medzi chunkmi | P0 |
-| CE-003 | Split na odstavce (`\n\n`), potom vety | P0 |
-| CE-004 | **Kontextový prefix:** | P0 |
+| CE-001 | **Chunk parametre** (TBD — určené benchmarkom na 3-5 testovacích výzvách): | P0 |
+| CE-001a | Cieľová dĺžka chunku (v tokenoch) — navrhované rozsahy: 300-500 | TBD |
+| CE-001b | Maximálna dĺžka chunku — navrhované rozsahy: 500-700 | TBD |
+| CE-001c | Minimálna dĺžka chunku — navrhované rozsahy: 150-300 | TBD |
+| CE-002 | **Overlap** medzi chunkmi — navrhované rozsahy: 30-100 tokenov | TBD |
+| CE-003 | Split strategy: odstavce (`\n\n`), potom vety ako fallback | P0 |
+| CE-004 | **Kontextový prefix** pre každý chunk: | P0 |
 | CE-004a | Názov výzvy | P0 |
 | CE-004b | Názov dokumentu | P0 |
-| CE-004c | Názov sekcie (ak detekovaný) | P1 |
-| CE-005 | Embedding model: OpenAI text-embedding-3-large (3072 dim) | P0 |
+| CE-004c | Názov sekcie (ak detekovaný z PDF) | P1 |
+| CE-005 | **Embedding model** — testovanie viacerých možností: | P0 |
+| CE-005a | OpenAI text-embedding-3-large (3072 dim) — primary candidate | P0 |
+| CE-005b | OpenAI text-embedding-3-small (1536 dim) — fallback | P1 |
 | CE-006 | Ukladá do v2_call_chunks: call_id, content, embedding, chunk_index, source | P0 |
+| CE-007 | **Benchmark:** porovnanie retrieval accuracy na 10 testovacích otázkach s known answers | P0 |
 
 ### 4.4 VectorSearch Module
 
