@@ -146,13 +146,6 @@ class BaseHandler(ABC):
 
                     # Save attributes
                     if attributes:
-                        # Add standard attributes from call
-                        if call.eligible_applicants:
-                            attributes["opravneni_ziadatelia"] = call.eligible_applicants
-                        if call.provider:
-                            attributes["vyhlasovatel_vyzvy"] = call.provider
-                        if call.total_allocation:
-                            attributes["alokacia_eu"] = str(call.total_allocation)
                         db.save_attributes(call_id, attributes)
 
                     log.info(f"[{self.source_name}] [{i+1}/{len(listings)}] "
