@@ -215,6 +215,37 @@ def cmd_export_pdf(args):
     return 0
 
 
+def cmd_enrich(args):
+    """Enrich existing chunks with metadata and re-embed."""
+    from scraper.embedder.embedder import enrich_existing_chunks
+
+    db = get_db()
+
+    if args.call_id:
+        call_ids = [args.call_id]
+    elif args.all:
+        # Get all unique call_ids with chunks
+        result = db._get("v2_call_chunks", {
+            "select": "call_id",
+            "deleted_at": "is.null",
+            "order": "call_id.asc",
+        })
+        call_ids = sorted(set(r["call_id"] for r in result))
+    else:
+        print("Specify --call-id or --all")
+        return 1
+
+    total = 0
+    for i, cid in enumerate(call_ids):
+        log.info(f"[{i + 1}/{len(call_ids)}] Enriching call_id={cid}...")
+        n = enrich_existing_chunks(cid)
+        total += n
+        log.info(f"  Enriched {n} chunks")
+
+    print(f"\nTotal enriched chunks: {total}")
+    return 0
+
+
 def cmd_status(args):
     """Show scraper status."""
     db = get_db()
@@ -262,6 +293,11 @@ def main():
     embed_p.add_argument("--force", action="store_true", help="Re-embed existing")
     embed_p.add_argument("--dry-run", action="store_true", help="Skip actual embedding")
 
+    # Enrich
+    enrich_p = sub.add_parser("enrich", help="Enrich existing chunks with metadata + re-embed")
+    enrich_p.add_argument("--call-id", type=int, help="Specific call ID")
+    enrich_p.add_argument("--all", action="store_true", help="Enrich all calls")
+
     # Cleanup
     cleanup_p = sub.add_parser("cleanup", help="Run cleanup + dedup")
     cleanup_p.add_argument("--months", type=int, default=12, help="Months threshold")
@@ -290,6 +326,7 @@ def main():
     commands = {
         "scrape": cmd_scrape,
         "embed": cmd_embed,
+        "enrich": cmd_enrich,
         "cleanup": cmd_cleanup,
         "export-pdf": cmd_export_pdf,
         "status": cmd_status,
