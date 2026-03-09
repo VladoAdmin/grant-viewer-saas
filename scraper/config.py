@@ -22,6 +22,9 @@ EMBED_MODEL = "text-embedding-3-large"
 EMBED_DIM = 3072
 EMBED_BATCH_SIZE = 96
 
+# Metadata / Rerank / Completeness model
+METADATA_MODEL = "gpt-4o-mini"
+
 # Chunker config
 CHUNK_TARGET_TOKENS = 768
 CHUNK_MAX_TOKENS = 1024
