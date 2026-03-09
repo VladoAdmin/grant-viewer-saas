@@ -1,4 +1,7 @@
-__pycache__/
 *.pyc
-storage/pdf_cache/
+*.tsbuildinfo
 .pytest_cache/
+__pycache__/
+dist/
+node_modules/
+storage/pdf_cache/
