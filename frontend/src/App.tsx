@@ -67,7 +67,7 @@ function Layout() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/grant-viewer">
       <Layout />
     </BrowserRouter>
   );
