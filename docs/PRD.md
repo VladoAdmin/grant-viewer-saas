@@ -45,7 +45,26 @@
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### 3.2 Data Flow
+### 3.2 Existing Codebase (Legacy Grant Scraper)
+
+Tento projekt **nie je greenfield** — vychádza z existujúcej kódovej báze `grant-scraper`, ktorá už obsahuje:
+
+| Komponent | Súbor | Status | Poznámka |
+|-----------|-------|--------|----------|
+| **Universal Extractor** | `universal_extractor.py` | ✅ Funkčný | Classification + extraction pre 8+ zdrojov |
+| **Enrichment Engine** | `enrich_active_calls.py` | ✅ Funkčný | Orchestrácia extrakcie, GPT-4o-mini parsing |
+| **Unified Pipeline** | `grant_pipeline.py` | ✅ Funkčný | End-to-end: scrape → classify → chunk → embed |
+| **Document Classifier** | `document_classifier.py` | ✅ Funkčný | Rule-based + AI fallback classification |
+| **Smart Chunker** | `smart_chunker_v2.py` | ✅ Funkčný | 400 token chunks, overlap, kontext prefix |
+| **ITMS21 Scraper** | `itms21_api_scraper.py` | ✅ Funkčný | API-based scraping pre ITMS21 |
+| **Vectorization** | `vectorize_calls_v3.py` | ✅ Funkčný | OpenAI embeddings, Supabase storage |
+| **Semantic Search** | `semantic_search.py` | ⚠️ Partial | Vector search, potrebuje hybrid upgrade |
+
+**GitHub Repo:** https://github.com/VladoAdmin/grant-viewer-saas  
+**Branch:** `saas-refactor` (nový branch pre SaaS vývoj)  
+**Legacy:** `main` (pôvodný kód z grant-scraper)
+
+### 3.3 Data Flow
 
 ```
 1. SCHEDULER (cron) → spustí GrantScraper každých 6 hodín
