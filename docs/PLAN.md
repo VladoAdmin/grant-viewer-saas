@@ -2,14 +2,16 @@
 
 ## Cieľ
 
-Postaviť funkčné MVP za 2 týždne: scraping 3 zdrojov (ITMS21, APA/ISPP, SIEA), PDF extraction + chunking + embedding do vektorovej DB, hybrid search, a web app so zoznamom výziev + kontextovým vyhľadávaním.
+Postaviť funkčné MVP za 2 týždne: reuse existujúcej kódovej bázy (grant-scraper), scraping ITMS21 (MVP scope), PDF extraction + chunking + embedding do vektorovej DB, hybrid search, web app so zoznamom výziev + kontextovým vyhľadávaním + PDF export.
 
 ## Kontext
 
-- **PRD:** docs/PRD.md
+- **PRD:** docs/PRD.md (v1.4 — NOT greenfield, reuse existing code)
 - **Fáza:** Phase 1 MVP (Week 1-2)
-- **Predchádzajúce:** Greenfield projekt, iba PRD existuje
-- **Tech stack:** Python scrapers, Express.js + TypeScript backend, React frontend, Supabase (PostgreSQL + pgvector)
+- **Predchádzajúce:** Existujúca kódová báza v `/home/clawd/Projects/grant-scraper/`, importovaná do `grant-viewer-saas`
+- **Tech stack:** Python (reuse), Express.js + TypeScript (new), React (new), Supabase (PostgreSQL + pgvector)
+- **MVP Scope:** Iba ITMS21 (nie 3 zdroje)
+- **Hosting:** StormLevel.com (WebSupport)
 
 ## Reference Docs
 
@@ -86,39 +88,48 @@ grant-viewer-saas/
 
 ## Task List
 
-### Week 1: Backend + Scraping Pipeline
+### Week 1: Backend + Refactor (Reuse Existing Code)
+
+| ID | Task | Estimate | Dependencies | Priority | Note |
+|----|------|----------|--------------|----------|------|
+| TASK-001 | Supabase schema + migrácie (cleanup, dedup tables) | 3h | — | P0 | Include dedup + cleanup tables |
+| TASK-002 | Refactor: Reuse `universal_extractor.py` + `grant_pipeline.py` | 4h | TASK-001 | P0 | Adapt to new schema |
+| TASK-003 | ITMS21 handler (reuse `itms21_api_scraper.py`) | 2h | TASK-002 | P0 | MVP = ITMS21 only |
+| TASK-004 | ZIP/PDF extractor (reuse existing) | 2h | TASK-002 | P0 | Adapt classifier |
+| TASK-005 | Chunker + Embedder (reuse `smart_chunker_v2.py`, `vectorize_calls_v3.py`) | 3h | TASK-004 | P0 | Benchmark params TBD |
+| TASK-006 | Hybrid search RPC (vector + fulltext + RRF) | 3h | TASK-001, TASK-005 | P0 | Supabase hybrid search pattern |
+| TASK-007 | **PDF Export** — generovanie sumárneho PDF | 4h | TASK-001 | P0 | Podľa vzoru z Google Drive |
+| TASK-008 | **Error handling** — error logging, error_id, graceful degradation | 3h | TASK-002 | P0 | Nesmie spadnúť |
+| TASK-009 | **Cleanup + Dedup** — scheduled cleanup old calls, dedup detection | 3h | TASK-001 | P0 | Background job |
+
+### Week 2: API + Frontend (New)
 
 | ID | Task | Estimate | Dependencies | Priority |
 |----|------|----------|--------------|----------|
-| TASK-001 | Supabase schema + migrácie | 3h | — | P0 |
-| TASK-002 | Python scraper framework (base handler, config, DB client) | 4h | TASK-001 | P0 |
-| TASK-003 | ITMS21 handler | 5h | TASK-002 | P0 |
-| TASK-004 | APA handler | 4h | TASK-002 | P0 |
-| TASK-005 | SIEA handler | 4h | TASK-002 | P0 |
-| TASK-006 | ZIP/PDF extractor (PyMuPDF) | 4h | TASK-002 | P0 |
-| TASK-007 | Rule-based document classifier | 3h | TASK-006 | P0 |
-| TASK-008 | Chunker (400 tokens, 50 overlap, context prefix) | 3h | TASK-006 | P0 |
-| TASK-009 | Embedder (OpenAI text-embedding-3-large) | 3h | TASK-008 | P0 |
-| TASK-010 | Hybrid search RPC function (vector + fulltext + RRF) | 3h | TASK-001, TASK-009 | P0 |
+| TASK-010 | Express.js API setup (TypeScript, CORS, error handling) | 2h | TASK-001 | P0 |
+| TASK-011 | API: GET /api/calls (list + filters) | 2h | TASK-010 | P0 |
+| TASK-012 | API: GET /api/calls/:id (detail + attributes) | 2h | TASK-011 | P0 |
+| TASK-013 | API: POST /api/search (hybrid search) | 3h | TASK-006, TASK-010 | P0 |
+| TASK-014 | API: GET /api/calls/:id/export-pdf | 3h | TASK-007, TASK-010 | P0 |
+| TASK-015 | API: GET /api/admin/status + POST /api/admin/trigger | 2h | TASK-010 | P0 |
+| TASK-016 | API: POST /api/feedback (podnety na opravu) | 2h | TASK-010 | P1 |
+| TASK-017 | React app setup (Vite + Tailwind + React Router) | 2h | — | P0 |
+| TASK-018 | CallList page (zoznam výziev + filtrovanie) | 4h | TASK-011, TASK-017 | P0 |
+| TASK-019 | CallDetail page (detail + PDF export button) | 3h | TASK-012, TASK-014, TASK-017 | P0 |
+| TASK-020 | Search page (kontextové vyhľadávanie) | 4h | TASK-013, TASK-017 | P0 |
+| TASK-021 | **Help page** — manuál pre užívateľa | 3h | TASK-017 | P1 |
+| TASK-022 | **Feedback modal** — podnety na opravu | 2h | TASK-016, TASK-017 | P1 |
+| TASK-023 | AdminStatus page (scraper status, manual trigger) | 2h | TASK-015, TASK-017 | P1 |
+| TASK-024 | End-to-end integration test | 3h | ALL | P0 |
+| TASK-025 | Deploy (StormLevel hosting) | 2h | ALL | P0 |
 
-### Week 2: API + Frontend
+**Total estimate: 58 hodín (~7-8 pracovných dní)**
 
-| ID | Task | Estimate | Dependencies | Priority |
-|----|------|----------|--------------|----------|
-| TASK-011 | Express.js API setup (TypeScript, CORS, error handling) | 2h | TASK-001 | P0 |
-| TASK-012 | API: GET /api/calls (list + filters) | 2h | TASK-011 | P0 |
-| TASK-013 | API: GET /api/calls/:id (detail + attributes) | 2h | TASK-012 | P0 |
-| TASK-014 | API: POST /api/search (hybrid search) | 3h | TASK-010, TASK-011 | P0 |
-| TASK-015 | API: GET /api/admin/status + POST /api/admin/trigger | 2h | TASK-011 | P0 |
-| TASK-016 | React app setup (Vite + Tailwind + React Router) | 2h | — | P0 |
-| TASK-017 | CallList page (zoznam výziev + filtrovanie) | 4h | TASK-012, TASK-016 | P0 |
-| TASK-018 | CallDetail page (detail výzvy + atribúty) | 3h | TASK-013, TASK-016 | P0 |
-| TASK-019 | Search page (kontextové vyhľadávanie) | 4h | TASK-014, TASK-016 | P0 |
-| TASK-020 | AdminStatus page (scraper status, manual trigger) | 2h | TASK-015, TASK-016 | P1 |
-| TASK-021 | End-to-end integration test (scrape → embed → search → display) | 3h | ALL | P0 |
-| TASK-022 | Deploy (Vercel frontend, VPS backend, Supabase DB) | 3h | ALL | P0 |
-
-**Total estimate: 63 hodín (~8 pracovných dní)**
+### Zmeny oproti pôvodnému PLAN.md:
+- ❌ Odstránené: APA handler, SIEA handler (MVP = ITMS21 only)
+- ✅ Pridané: PDF export (P0), Error handling (P0), Cleanup/Dedup (P0), Help page, Feedback modal
+- ✅ Upravené: Reuse existing code (nie greenfield)
+- ✅ Hosting: StormLevel (nie Vercel/VPS split)
 
 ---
 
