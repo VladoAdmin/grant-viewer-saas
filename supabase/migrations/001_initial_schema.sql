@@ -270,8 +270,8 @@ $$ LANGUAGE plpgsql;
 -- ============================================================
 CREATE OR REPLACE FUNCTION find_duplicate_calls()
 RETURNS TABLE (
-    original_id INT,
-    duplicate_id INT,
+    original_id BIGINT,
+    duplicate_id BIGINT,
     original_title TEXT,
     duplicate_title TEXT,
     match_type TEXT
