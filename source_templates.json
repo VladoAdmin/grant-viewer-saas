@@ -1,0 +1,16 @@
+{
+  "portal.itms21.sk": {
+    "attachments_field": "grant_calls_v2.attachments",
+    "type": "jsonb_array",
+    "pdf_selector": "url ENDS WITH '.pdf'",
+    "section": "Doplnujúce informácie a dokumenty"
+  },
+  "planobnovy.sk": {
+    "attachments_field": "grant_call_attachments",
+    "type": "related_table"
+  },
+  "apvv.sk": {
+    "attachments_field": "grant_call_attachments",
+    "type": "related_table"
+  }
+}

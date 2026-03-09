@@ -67,7 +67,7 @@
 | GS-003 | Sťahuje základné údaje: názov, alokácia, deadline, zdroj | P0 |
 | GS-004 | Sťahuje prílohy (ZIP/PDF) do object storage | P0 |
 | GS-005 | Ukladá metadata o prílohách do grant_call_attachments | P0 |
-| GS-006 | Scheduler: každých 6 hodín (cron) | P1 |
+| GS-006 | Scheduler: každých 24 hodín (cron) | P1 |
 | GS-007 | Notifikácia o nových výzvach (email/Telegram) | P2 |
 
 ### 4.2 DocExtractor Module

@@ -1,0 +1,25 @@
+# GrantBot V2 Dependencies
+# Install: pip install -r requirements_v2.txt
+
+# HTTP client
+httpx>=0.27.0
+requests>=2.31.0
+
+# HTML parsing
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+
+# Browser automation
+playwright>=1.41.0
+
+# Data validation
+pydantic>=2.6.0
+
+# Async support
+aiohttp>=3.9.0
+
+# Environment
+python-dotenv>=1.0.0
+
+# Utilities
+pyyaml>=6.0.1

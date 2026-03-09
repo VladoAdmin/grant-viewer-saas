@@ -1,0 +1,7 @@
+requests
+beautifulsoup4
+python-dateutil
+fastapi
+uvicorn
+pdfplumber
+python-docx
