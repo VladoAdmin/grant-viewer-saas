@@ -159,8 +159,23 @@ Tento projekt **nie je greenfield** — vychádza z existujúcej kódovej báze 
 | GV-004 | Zobrazenie detailu výzvy s extrahovanými atribútmi | P0 |
 | GV-005 | Zobrazenie zdrojových dokumentov (PDF viewer) | P1 |
 | GV-006 | Notifikácie o nových výzvach (email) | P2 |
-| GV-007 | Export výzvy do PDF reportu | P2 |
+| GV-007 | **PDF Export** — generovanie sumárneho PDF podľa vzoru z Google Drive | P0 |
 | GV-008 | Admin dashboard pre správu zdrojov | P2 |
+| GV-009 | **Help** — manuál pre používateľa s návodom na používanie | P1 |
+| GV-010 | **Podnety na opravu** — formulár pre zaslanie feedbacku/opravy údajov alebo procesu | P1 |
+
+### 4.6 Operational & Data Management Requirements
+
+| ID | Requirement | Priority |
+|----|-------------|----------|
+| OP-001 | **Deduplikácia výziev:** unikátny key `(title_lowercase, announced_at)`, kontrola pred vložením | P0 |
+| OP-002 | **Cleanup vektorovej DB:** výzvy staršie ako 12 mesiacov od deadline → soft-delete (mark deleted), hard-delete z v2_call_chunks po 3 mesiacoch | P0 |
+| OP-003 | **Error handling:** systém nesmie spadnúť do error stavu pri scrapingu/embedovaní/extrakcii | P0 |
+| OP-003a | Chyby sa zaznamenajú do error logu s error_id | P0 |
+| OP-003b | Používateľovi sa zobrazí štandardná správa "Chyba pri spracovaní" s error_id | P0 |
+| OP-003c | Error_id sa postúpi na analýzu (notifikácia adminovi) | P0 |
+| OP-004 | **MVP scope:** Iba ITMS21 zdroj v Phase 1 | P0 |
+| OP-005 | **Deployment:** StormLevel.com hosting (WebSupport), cesta `/var/www/stormlevel.com/grant-viewer` | P0 |
 
 ## 5. Non-Functional Requirements
 
