@@ -100,6 +100,33 @@ class SupabaseClient:
         result = self._get("grant_calls_v2", {"id": f"eq.{call_id}", "limit": "1"})
         return result[0] if result else None
 
+    def update_grant_call(self, call_id: int, data: Dict[str, Any]) -> bool:
+        """PATCH a grant call with non-null fields only.
+
+        Used to update fields extracted from PDF attachments
+        (announced_at, total_allocation, deadline_at, provider).
+
+        Returns True on success.
+        """
+        # Filter out None values
+        patch_data = {k: v for k, v in data.items() if v is not None}
+        if not patch_data:
+            return True
+
+        url = f"{self.base_url}/rest/v1/grant_calls_v2"
+        r = requests.patch(
+            url,
+            headers=self._headers("return=minimal"),
+            params={"id": f"eq.{call_id}"},
+            json=patch_data,
+            timeout=30,
+        )
+        if r.status_code >= 400:
+            log.error(f"update_grant_call({call_id}) failed: {r.status_code} {r.text[:300]}")
+            return False
+        log.info(f"Updated grant_call {call_id}: {list(patch_data.keys())}")
+        return True
+
     # =========================================================================
     # Attachments
     # =========================================================================

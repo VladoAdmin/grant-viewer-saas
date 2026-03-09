@@ -65,6 +65,7 @@ def cmd_embed(args):
     from scraper.embedder.embedder import embed_and_store
     from scraper.extractor.zip_handler import extract_from_url
     from scraper.extractor.classifier import classify_document
+    from scraper.extractor.attribute_extractor import extract_attributes
 
     db = get_db()
     collector = ErrorCollector("embedder")
@@ -117,7 +118,7 @@ def cmd_embed(args):
 
                 extracted = extract_from_url(url)
                 for doc in extracted:
-                    doc_type, confidence = classify_document(doc.filename, doc.text[:2000])
+                    doc_type, confidence = classify_document(doc.filename, doc.text[:4000])
                     if doc_type == "skip":
                         continue
                     documents.append({
@@ -128,6 +129,41 @@ def cmd_embed(args):
                     })
 
             if documents:
+                # --- Attribute extraction (before chunking) ---
+                try:
+                    pdf_attrs = extract_attributes(documents)
+                    if pdf_attrs:
+                        # Get existing API attributes (fallback)
+                        api_attrs = db.get_attributes(call_id)
+
+                        # Merge: API is base, PDF overwrites (PDF has priority)
+                        merged_attrs = {**api_attrs, **pdf_attrs}
+
+                        # Update grant_calls_v2 columns from extracted attributes
+                        call_update = {}
+                        if pdf_attrs.get("datum_vyhlasenia"):
+                            call_update["announced_at"] = pdf_attrs["datum_vyhlasenia"]
+                        if pdf_attrs.get("celkova_alokacia"):
+                            call_update["total_allocation"] = pdf_attrs["celkova_alokacia"]
+                        if pdf_attrs.get("deadline"):
+                            # Only set deadline_at if it's a proper date (YYYY-MM-DD)
+                            import re as _re
+                            if _re.match(r'^\d{4}-\d{2}-\d{2}$', pdf_attrs["deadline"]):
+                                call_update["deadline_at"] = pdf_attrs["deadline"]
+                        if pdf_attrs.get("poskytovatel"):
+                            call_update["provider"] = pdf_attrs["poskytovatel"][:500]
+
+                        if call_update:
+                            db.update_grant_call(call_id, call_update)
+
+                        # Save all attributes (merged)
+                        db.save_attributes(call_id, merged_attrs)
+                        log.info(f"  Attributes: {len(pdf_attrs)} from PDF, "
+                                 f"{len(merged_attrs)} total (merged with API)")
+                except Exception as e:
+                    log.warning(f"  Attribute extraction failed for call {call_id}: {e}")
+
+                # --- Chunking and embedding ---
                 n = embed_and_store(call_id, title, documents, dry_run=args.dry_run)
                 total_chunks += n
                 log.info(f"  Created {n} chunks")
