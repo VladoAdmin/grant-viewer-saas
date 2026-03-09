@@ -21,6 +21,8 @@ CLASSIFICATION_RULES = {
             "vyzva", "výzva", "specifikacia", "špecifikácia",
             "vseobecne-podmienky", "všeobecné podmienky", "usmernenie",
             "plne-znenie", "plné znenie",
+            # Envirofond-specific
+            "specifikacia_oblast", "specifikacia-cinnosti",
         ],
         "content_keywords": [
             "výzva", "vyzva", "špecifikácia", "specifikacia",
@@ -30,6 +32,9 @@ CLASSIFICATION_RULES = {
             "indikatívna výška", "finančné prostriedky",
             "predmet výzvy", "účel výzvy", "výzva na predkladanie",
             "oprávnené územie", "Program Slovensko",
+            # Envirofond-specific
+            "špecifikácia činností", "environmentálny fond",
+            "maximálna výška dotácie", "podpora formou dotácie",
         ],
         "content_sections": [
             "predmet výzvy", "cieľ výzvy", "oprávnení žiadatelia",
@@ -46,6 +51,8 @@ CLASSIFICATION_RULES = {
             "podmienky", "prirucka", "príručka", "opravnen",
             "priloha-c-1", "príloha č. 1", "priloha_1",
             "synergick",
+            # Envirofond-specific
+            "prirucka-pre-ziadatela", "priloha-c.-1",
         ],
         "content_keywords": [
             "podmienky", "podmienka", "oprávnenosť", "oprávnený žiadateľ",
@@ -55,6 +62,8 @@ CLASSIFICATION_RULES = {
             "žiadosť o nenávratný finančný príspevok",
             "oprávnené výdavky", "neoprávnené výdavky",
             "podmienky týkajúce sa", "preukázanie splnenia",
+            # Envirofond-specific
+            "príručka pre žiadateľa", "postup predkladania žiadosti",
         ],
         "content_sections": [
             "podmienky poskytnutia príspevku",
@@ -69,12 +78,16 @@ CLASSIFICATION_RULES = {
         "filename_keywords": [
             "kriteria", "kritériá", "hodnotenie", "vyhodnotenie",
             "priloha-c-2", "príloha č. 2", "priloha_2",
+            # Envirofond-specific
+            "hodnotiace-kriteria", "priloha-c.-2",
         ],
         "content_keywords": [
             "kritériá", "hodnotenie", "vyhodnotenie", "bodové hodnotenie",
             "hodnotiace kritériá", "hodnotiacie kritériá",
             "kritérium", "bodový systém", "výberové kritériá",
             "merateľný ukazovateľ", "merateľné ukazovatele",
+            # Envirofond-specific
+            "hodnotiace kritériá pre oblasť",
         ],
         "content_sections": [
             "hodnotiace kritériá", "výberové kritériá",

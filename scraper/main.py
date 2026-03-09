@@ -35,9 +35,11 @@ log = logging.getLogger("scraper")
 def cmd_scrape(args):
     """Run scraper for specified source."""
     from scraper.handlers.itms21 import ITMS21Handler
+    from scraper.handlers.envirofond import EnvirofondHandler
 
     handlers = {
         "itms21": ITMS21Handler,
+        "envirofond": EnvirofondHandler,
     }
 
     source = args.source.lower()
@@ -283,7 +285,7 @@ def main():
 
     # Scrape
     scrape_p = sub.add_parser("scrape", help="Scrape grant calls")
-    scrape_p.add_argument("--source", default="itms21", help="Source (itms21)")
+    scrape_p.add_argument("--source", default="itms21", help="Source (itms21, envirofond)")
     scrape_p.add_argument("--limit", type=int, default=200, help="Max calls")
 
     # Embed
