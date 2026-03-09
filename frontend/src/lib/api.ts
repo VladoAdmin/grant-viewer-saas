@@ -54,6 +54,17 @@ export interface SearchResult {
   doc_type: string;
   similarity: number;
   rank: number;
+  rerank_score?: number;
+  rerank_reason?: string;
+}
+
+export interface CompletenessInfo {
+  complete: boolean;
+  confidence: number;
+  missing: string[];
+  suggested_queries: string[];
+  iterations: number;
+  chunks_used: number;
 }
 
 export interface SearchResponse {
@@ -61,6 +72,8 @@ export interface SearchResponse {
   query: string;
   took_ms: number;
   total: number;
+  deep?: boolean;
+  completeness?: CompletenessInfo;
 }
 
 export interface CallsResponse {
@@ -89,7 +102,7 @@ export function getCallDetail(id: number): Promise<CallDetail> {
   return apiFetch(`/calls/${id}`);
 }
 
-export function search(query: string, options?: { call_id?: number; doc_type?: string; limit?: number }): Promise<SearchResponse> {
+export function search(query: string, options?: { call_id?: number; doc_type?: string; limit?: number; deep?: boolean }): Promise<SearchResponse> {
   return apiFetch('/search', {
     method: 'POST',
     body: JSON.stringify({ query, ...options }),

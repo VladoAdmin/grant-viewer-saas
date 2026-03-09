@@ -39,6 +39,11 @@ export default function ChunkResult({ result }: { result: SearchResult }) {
           <span className="bg-gray-100 px-2 py-0.5 rounded">{result.doc_type}</span>
         )}
         <span>#{result.rank}</span>
+        {result.rerank_score !== undefined && (
+          <span className="bg-purple-100 text-purple-700 px-2 py-0.5 rounded font-medium" title={result.rerank_reason || ''}>
+            🧠 {result.rerank_score.toFixed(1)}/10
+          </span>
+        )}
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { search, type SearchResult } from '../lib/api';
+import { search, type SearchResult, type CompletenessInfo } from '../lib/api';
 import ChunkResult from '../components/ChunkResult';
 
 const EXAMPLE_QUERIES = [
@@ -17,6 +17,9 @@ export default function Search() {
   const [error, setError] = useState<string | null>(null);
   const [tookMs, setTookMs] = useState<number | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [deep, setDeep] = useState(false);
+  const [completeness, setCompleteness] = useState<CompletenessInfo | null>(null);
+  const [isDeepResult, setIsDeepResult] = useState(false);
 
   async function handleSearch(q?: string) {
     const searchQuery = q || query;
@@ -26,11 +29,14 @@ export default function Search() {
     setLoading(true);
     setError(null);
     setHasSearched(true);
+    setCompleteness(null);
 
     try {
-      const resp = await search(searchQuery.trim(), { limit: 10 });
+      const resp = await search(searchQuery.trim(), { limit: 10, deep });
       setResults(resp.results);
       setTookMs(resp.took_ms);
+      setCompleteness(resp.completeness || null);
+      setIsDeepResult(!!resp.deep);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Vyhľadávanie zlyhalo');
       setResults([]);
@@ -80,6 +86,23 @@ export default function Search() {
           </div>
         </form>
 
+        {/* Deep search toggle */}
+        <div className="mt-3 flex items-center gap-2">
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={deep}
+              onChange={(e) => setDeep(e.target.checked)}
+              className="sr-only peer"
+            />
+            <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+          </label>
+          <span className="text-sm text-gray-600">
+            Detailné vyhľadávanie
+            <span className="text-xs text-gray-400 ml-1">(AI reranking + hodnotenie kompletnosti)</span>
+          </span>
+        </div>
+
         {/* Example queries */}
         {!hasSearched && (
           <div className="mt-4">
@@ -123,8 +146,57 @@ export default function Search() {
                 ? `Nájdených ${results.length} výsledkov`
                 : 'Žiadne výsledky'}
               {tookMs !== null && ` (${(tookMs / 1000).toFixed(1)}s)`}
+              {isDeepResult && (
+                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                  🧠 AI reranking
+                </span>
+              )}
             </p>
           </div>
+
+          {/* Completeness info */}
+          {completeness && isDeepResult && (
+            <div className={`rounded-lg border p-4 mb-4 ${
+              completeness.complete
+                ? 'bg-green-50 border-green-200'
+                : 'bg-amber-50 border-amber-200'
+            }`}>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm font-medium">
+                  {completeness.complete ? '✅ Kompletná odpoveď' : '⚠️ Čiastočná odpoveď'}
+                </span>
+                <span className="text-xs text-gray-500">
+                  (istota: {Math.round(completeness.confidence * 100)}%)
+                </span>
+              </div>
+              {completeness.missing.length > 0 && (
+                <div className="mt-2">
+                  <p className="text-xs font-medium text-gray-600">Chýbajúce informácie:</p>
+                  <ul className="mt-1 text-xs text-gray-500 list-disc list-inside">
+                    {completeness.missing.map((m, i) => (
+                      <li key={i}>{m}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {completeness.suggested_queries && completeness.suggested_queries.length > 0 && (
+                <div className="mt-2">
+                  <p className="text-xs font-medium text-gray-600">Odporúčané doplnkové dotazy:</p>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {completeness.suggested_queries.map((sq, i) => (
+                      <button
+                        key={i}
+                        onClick={() => handleSearch(sq)}
+                        className="text-xs bg-white hover:bg-blue-50 hover:text-blue-700 text-gray-600 border border-gray-200 rounded-full px-2 py-1 transition-colors"
+                      >
+                        {sq}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {results.length === 0 ? (
             <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
