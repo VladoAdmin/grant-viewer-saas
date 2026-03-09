@@ -6,6 +6,7 @@ import { Router, Request, Response } from 'express';
 import { supabaseGet } from '../lib/supabase';
 import { getCallDetail } from '../services/callService';
 import { generatePdf } from '../services/pdfService';
+import { extractCallAttributes } from '../services/extractionService';
 
 const router = Router();
 
@@ -96,6 +97,30 @@ router.get('/:id', async (req: Request, res: Response) => {
   } catch (err) {
     console.error('[GET /api/calls/:id]', err);
     res.status(500).json({ error: 'Failed to fetch call detail', message: String(err) });
+  }
+});
+
+/**
+ * GET /api/calls/:id/extracted-attributes
+ * Extract structured attributes from PDF chunks via vector search + GPT.
+ * Results are cached in grant_call_attributes with vs_ prefix.
+ */
+router.get('/:id/extracted-attributes', async (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+      res.status(400).json({ error: 'Invalid call ID' });
+      return;
+    }
+
+    const attributes = await extractCallAttributes(id);
+    res.json(attributes);
+  } catch (err) {
+    console.error('[GET /api/calls/:id/extracted-attributes]', err);
+    res.status(500).json({
+      error: 'Failed to extract attributes',
+      message: String(err),
+    });
   }
 });
 
