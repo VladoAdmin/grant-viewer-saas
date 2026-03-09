@@ -18,8 +18,8 @@ SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY", "")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 
 # Embedding config
-EMBED_MODEL = "text-embedding-3-small"
-EMBED_DIM = 1536
+EMBED_MODEL = "text-embedding-3-large"
+EMBED_DIM = 3072
 EMBED_BATCH_SIZE = 96
 
 # Chunker config
