@@ -21,10 +21,16 @@ const app = express();
 const PORT = parseInt(process.env.PORT || '3001', 10);
 
 // Middleware
+// Handle Private Network Access (PNA) preflight — Chrome requires this
+// for cross-origin requests to local/private network addresses
+app.use((_req, _res, next) => {
+  _res.setHeader('Access-Control-Allow-Private-Network', 'true');
+  next();
+});
 app.use(cors({
   origin: process.env.CORS_ORIGIN || '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Access-Control-Request-Private-Network'],
 }));
 app.use(express.json({ limit: '1mb' }));
 
