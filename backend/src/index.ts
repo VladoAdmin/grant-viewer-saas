@@ -6,6 +6,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 
 // Load env
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
@@ -42,7 +43,21 @@ app.use('/api/search', searchRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/feedback', feedbackRouter);
 
-// 404 handler
+// Serve frontend static files in production
+const frontendPath = path.resolve(__dirname, '../../frontend/dist');
+if (fs.existsSync(frontendPath)) {
+  app.use(express.static(frontendPath));
+  // SPA fallback: serve index.html for non-API routes
+  app.get('*', (req: Request, res: Response, next: NextFunction) => {
+    if (req.path.startsWith('/api/')) {
+      next();
+      return;
+    }
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  });
+}
+
+// 404 handler (for API routes)
 app.use((_req: Request, res: Response) => {
   res.status(404).json({ error: 'Not found', message: 'Endpoint does not exist' });
 });
